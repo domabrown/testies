@@ -3,7 +3,24 @@ import Lib
 import Data.List
 
 main :: IO ()
-main = return ()
+main = do
+  x <- readFile "input.txt"
+  print . reduce . solve . parseInput $ x 
+
+parseInput :: String -> [Int]
+parseInput = map read . lines
+
+data Change = Increase | Decrease 
+  deriving (Eq, Show) 
+
+solve :: [Int] -> [Change]
+solve [] = []
+solve [x] = []
+solve (x : y : zs) = (if (y > x ) then Increase else Decrease) : solve (y : zs)  
+
+reduce :: [Change] -> Int
+reduce x = length $ filter (== Increase) x
+
 
 doubleMe x = x + x
 doubleUs x y = x*2 + y*2
