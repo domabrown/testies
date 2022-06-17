@@ -36,10 +36,10 @@ So we want, Read file, Add all forward, take away all down from up
 submarine :: IO ()
 submarine = do 
   a <- readFile "submarine.txt"
-  print . solve
+  print . solve3 . solve2 .parseInput 
 
 
-parseInput :: String -> submarineDir Int
+parseInput :: String -> [submarineDir]   -- was complaining about getting [] and [[Int]] so put this which seems to have worked?
 parseInput = map read . lines  --- I want the dir + the int
 
 type Depth = Int     -- verti movement the 2 values I want added
@@ -48,20 +48,36 @@ type Movement = Int  -- hori movement
 data SubmarineDir =  Forward Int | Up Int | Down Int    -- the directions 
   deriving (Eq, Show)
 
+direction :: SubmarineDir -> (Depth , Movement)
+direction (Forward x)  = (x, y)  -- need not be 0? 
+direction (Up x)       = (y, +x)
+direction (Down x)     = (y, -x)
+
+solve2 :: [Int] -> submarineDir
+solve2 (Foward x) = (if (Forward x) then (y, +x)  : solve2 Forward x
+solve2 (Up x )    = (if (Up x)) then + x) : solve2 blahblah         -- is this basically just the same as using gurds |
+solve2 (Down x)   = (if (Down x) then - x) : solve2 blahblah 
+                    
+
+solve3 :: SubmarineDir -> [Int]
+solve3 = Movement * Depth   --need to get Movement linked with Forward and Depth with Up/Down
+--wrong, want it to keep adding forward, need to have Up and Down as well. going to have (0for, 0up, 0down) cords
+                                             
+
+
+
+
+
+
+{-
 SubmarineDir = dist . words
   where 
    dist ["forward", x] = Forward (read x) 
    dist ["up", x] = Up (read x)
    dist ["down", x] = Down (read x)
-
-
-direction :: [SubmarineDir] -> (Depth , Movement)
-direction (Forward , x) _ = (0 + x)
-direction (Up , x)      _ = (x + x)
-direction (Down , x )    _ = (x - x)
-
  --solve2 :: [Int] -> SubmarineDir
  -- solve2  = Movement * Depth 
+ -}
 
 
 
