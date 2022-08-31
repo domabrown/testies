@@ -36,48 +36,54 @@ So we want, Read file, Add all forward, take away all down from up
 submarine :: IO ()
 submarine = do 
   a <- readFile "submarine.txt"
-  print . solve3 . solve2 .parseInput 
+  print . solve3 . sumCoords . map direction . parseInput $ a
 
-
-parseInput :: String -> [submarineDir]   -- was complaining about getting [] and [[Int]] so put this which seems to have worked?
-parseInput = map read . lines  --- I want the dir + the int
+parseInput :: String -> [SubmarineDir]   -- was complaining about getting [] and [[Int]] so put this which seems to have worked?
+parseInput = map parseSubmarineDir . lines  --- I want the dir + the int
 
 type Depth = Int     -- verti movement the 2 values I want added
 type Movement = Int  -- hori movement
-
+type Coord = (Movement, Depth)
 data SubmarineDir =  Forward Int | Up Int | Down Int    -- the directions 
   deriving (Eq, Show)
 
-direction :: SubmarineDir -> (Depth , Movement)
-direction (Forward x)  = (x, y)  -- need not be 0? 
-direction (Up x)       = (y, +x)
-direction (Down x)     = (y, -x)
+direction :: SubmarineDir -> Coord
+direction (Forward x)  = (x, 0)  -- need not be 0? 
+direction (Up x)       = (0, -x)
+direction (Down x)     = (0, x)
 
+data V2 = MkV2 Int Int 
+  deriving (Eq, Show) 
+
+addV2 :: V2 -> V2 -> V2
+addV2 (MkV2 x1 y1) (MkV2 x2 y2) = MkV2 (x1 + x2) (y1 + y2)  --semigroup 
+ 
+instance Semigroup V2 where 
+  (<>) = addV2
+instance Monoid V2 where 
+  mempty = MkV2 0 0
+
+add :: Coord -> Coord -> Coord
+add (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
+
+sumCoords :: [Coord] -> Coord
+sumCoords = foldr add (0, 0)
+ {-
 solve2 :: [Int] -> submarineDir
-solve2 (Foward x) = (if (Forward x) then (y, +x)  : solve2 Forward x
-solve2 (Up x )    = (if (Up x)) then + x) : solve2 blahblah         -- is this basically just the same as using gurds |
+solve2 (Foward x) = (if (Forward x) then (y, +x)  : solve2 Forward x  -- does it go to the next statement?  if this then do that else contiune 
+solve2 (Up x)     = (if (Up x)) then + x) : solve2 blahblah         -- is this basically just the same as using guards |. 
 solve2 (Down x)   = (if (Down x) then - x) : solve2 blahblah 
-                    
+ -}                   
 
-solve3 :: SubmarineDir -> [Int]
-solve3 = Movement * Depth   --need to get Movement linked with Forward and Depth with Up/Down
+solve3 :: Coord -> Int
+solve3 (x, y) = (x * y)
 --wrong, want it to keep adding forward, need to have Up and Down as well. going to have (0for, 0up, 0down) cords
-                                             
-
-
-
-
-
-
-{-
-SubmarineDir = dist . words
+parseSubmarineDir :: String -> SubmarineDir                                            
+parseSubmarineDir = dist . words
   where 
    dist ["forward", x] = Forward (read x) 
    dist ["up", x] = Up (read x)
    dist ["down", x] = Down (read x)
- --solve2 :: [Int] -> SubmarineDir
- -- solve2  = Movement * Depth 
- -}
 
 
 
